@@ -4,13 +4,13 @@ from utils import adjust_data, options_scrapy
 
 
 class QuotesSpider(scrapy.Spider):
-    name = "quotes"
+    name = "football_stats"
 
     start_urls = convert_json.json_importer(options_scrapy.file_to_convert)
 
     def parse(self, response):
         data = {}
-
+        data["URL"] = response.url
         data["home_team"] = adjust_data.fix_teams_names(
             response.url.split("/")[7]
         )
@@ -33,4 +33,5 @@ class QuotesSpider(scrapy.Spider):
             data[f"home_team_{field}"] = response.css(f'.{field} > .stat_value_number_team_A::text').get() or ""
             data[f"away_team_{field}"] = response.css(f'.{field} > .stat_value_number_team_B::text').get() or ""
 
-        adjust_data.write_csv(data)
+        yield data
+        # adjust_data.write_csv(data)
